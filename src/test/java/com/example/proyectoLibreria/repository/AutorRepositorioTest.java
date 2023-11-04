@@ -21,6 +21,6 @@ class AutorRepositorioTest {
 
         Autor autorEncontrado = autorRepository.findByNombre("autor");
 
-        assertEquals(autor.getNombre(), autorEncontrado.getNombre());
+        assertEquals("autor", autorEncontrado.getNombre());
     }
 }

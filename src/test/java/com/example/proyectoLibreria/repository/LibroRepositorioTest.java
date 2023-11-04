@@ -17,14 +17,14 @@ class LibroRepositorioTest {
 
     @Test
     void findByTituloTest() {
-        Libro libro = new Libro(1L, 9781400032716L, "titulo", 2023, 100,
+        Libro libro = new Libro(1L, 9781400032716L, "libro", 2023, 100,
                                 50, 50, true, new Autor(1L, "autor",
                                 true), new Editorial(1L, "editorial", true));
 
         libroRepository.save(libro);
 
-        Libro libroEncontrado = libroRepository.findByTitulo("titulo");
+        Libro libroEncontrado = libroRepository.findByTitulo("libro");
 
-        assertEquals(libro.getTitulo(), libroEncontrado.getTitulo());
+        assertEquals("libro", libroEncontrado.getTitulo());
     }
 }

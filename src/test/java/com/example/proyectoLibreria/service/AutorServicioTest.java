@@ -2,7 +2,6 @@ package com.example.proyectoLibreria.service;
 
 import com.example.proyectoLibreria.dto.AutorDto;
 import com.example.proyectoLibreria.model.Autor;
-import com.example.proyectoLibreria.model.Libro;
 import com.example.proyectoLibreria.repository.AutorRepositorio;
 import java.util.Arrays;
 import java.util.List;
@@ -13,28 +12,29 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
 
 class AutorServicioTest {
+    @Mock
+    private AutorRepositorio autorRepositoryMock;
     @InjectMocks
     private AutorServicio autorService;
-    @Mock
-    private AutorRepositorio autorRepository;
 
     @Test
     void findAllAutoresTest() {
         Autor autor1 = mock(Autor.class);
         Autor autor2 = mock(Autor.class);
 
-        when(autorRepository.findAll()).thenReturn(Arrays.asList(autor1, autor2));
+        when(autorRepositoryMock.findAll()).thenReturn(Arrays.asList(autor1, autor2));
 
-        List<AutorDto> result =  autorService.findAllAutores();
+        List<AutorDto> listaAutores = autorService.findAllAutores();
 
-        assertEquals(2, result.size());
-        assertNotNull(result);
+        assertNotNull(listaAutores);
+        assertEquals(2, listaAutores.size());
+
+        verify(autorRepositoryMock, times(1)).findAll();
     }
 
     @Test
@@ -42,75 +42,78 @@ class AutorServicioTest {
         Autor autor = mock(Autor.class);
         AutorDto autorDto = mock(AutorDto.class);
 
-        when(autorRepository.save(autor)).thenReturn(autor);
+        when(autorRepositoryMock.save(autor)).thenReturn(autor);
 
-        String result = autorService.saveAutor(autorDto);
+        String mensaje = autorService.saveAutor(autorDto);
 
-        assertNotNull(result);
+        assertNotNull(mensaje);
+        assertEquals("Autor guardado exitosamente.", mensaje);
     }
 
     @Test
     void findAutorTest() {
-        Autor autor = mock(Autor.class);
+        Autor autor = new Autor();
 
         autor.setNombre("autor");
 
-        when(autorRepository.findByNombre("autor")).thenReturn(autor);
+        when(autorRepositoryMock.findByNombre("autor")).thenReturn(autor);
 
-        AutorDto result = autorService.findAutor("autor");
+        AutorDto autorEncontrado = autorService.findAutor("autor");
 
-        assertEquals(result.getNombre(), autor.getNombre());
-        assertNotNull(result);
+        assertNotNull(autorEncontrado);
+        assertEquals("autor", autorEncontrado.getNombre());
+
+        verify(autorRepositoryMock, times(1)).findByNombre("autor");
     }
 
     @Test
     void updateAutorTest() {
-        Autor autor = mock(Autor.class);
+        Autor autor = new Autor();
+        AutorDto autorDto = new AutorDto();
 
-        autor.setId(1L);
-        autor.setNombre("autor");
+        autorDto.setNombre("Jane Austen");
 
-        when(autorRepository.findById(anyLong())).thenReturn(Optional.ofNullable(autor));
+        when(autorRepositoryMock.findById(1L)).thenReturn(Optional.of(autor));
+        when(autorRepositoryMock.save(autor)).thenReturn(autor);
 
-        autor.setNombre("Jane Austen");
-        autor.setAlta(true);
+        String mensaje = autorService.updateAutor(1L, autorDto);
 
-        when(autorRepository.save(autor)).thenReturn(autor);
+        assertNotNull(mensaje);
+        assertEquals("El autor "+ autor.getNombre() +" fue actualizado correctamente.", mensaje);
 
-        AutorDto autorDto = mock(AutorDto.class);
-
-        String result = autorService.updateAutor(1L, autorDto);
-
-        assertEquals("El autor "+ autor.getNombre() +" fue actualizado correctamente.", result);
-        assertNotNull(result);
+        verify(autorRepositoryMock, times(1)).findById(1L);
+        verify(autorRepositoryMock, times(1)).save(autor);
     }
 
     @Test
     void lowAutorTest() {
         Autor autor = mock(Autor.class);
 
-        autor.setId(1L);
-        autor.setAlta(true);
+        when(autorRepositoryMock.findById(1L)).thenReturn(Optional.of(autor));
+        when(autorRepositoryMock.save(autor)).thenReturn(autor);
 
-        when(autorRepository.findById(1L)).thenReturn(Optional.of(autor));
+        String mensaje = autorService.lowAutor(1L);
 
-        String result = autorService.lowAutor(1L);
+        assertNotNull(mensaje);
+        assertEquals("El autor con ID " + 1L + " fue dado de baja correctamente.", mensaje);
 
-        assertEquals("El autor con ID " + 1L + " fue dado de baja correctamente.", result);
-        assertNotNull(result);
+        verify(autorRepositoryMock, times(1)).findById(1L);
+        verify(autorRepositoryMock, times(1)).save(autor);
     }
 
     @Test
     void deleteAutorTest() {
         Autor autor = mock(Autor.class);
 
-        autor.setId(1L);
+        when(autorRepositoryMock.findById(1L)).thenReturn(Optional.of(autor));
+        doNothing().when(autorRepositoryMock).deleteById(1L);
 
-        when(autorRepository.findById(1L)).thenReturn(Optional.of(autor));
+        String mensaje = autorService.deleteAutor(1L);
 
-        String result = autorService.deleteAutor(1L);
+        assertNotNull(mensaje);
+        assertEquals("El autor con ID " + 1L + " fue eliminado correctamente.", mensaje);
 
-        assertEquals("El autor con ID " + 1L + " fue eliminado correctamente.", result);
-        assertNotNull(result);
+        verify(autorRepositoryMock, times(1)).findById(1L);
+        verify(autorRepositoryMock, times(1)).deleteById(1L);
     }
 }

@@ -30,7 +30,7 @@ public class EditorialServicio implements EditorialI {
 
         editorialRepository.save(editorialEntity);
 
-        return "Editorial guardada exitosamente";
+        return "Editorial guardada exitosamente.";
     }
 
     @Override

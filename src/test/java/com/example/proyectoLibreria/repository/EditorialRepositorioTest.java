@@ -21,6 +21,6 @@ class EditorialRepositorioTest {
 
         Editorial editorialEncontrada = editorialRepository.findByNombre("editorial");
 
-        assertEquals(editorial.getNombre(), editorialEncontrada.getNombre());
+        assertEquals("editorial", editorialEncontrada.getNombre());
     }
 }

@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LibroTest {
-    Libro libro = new Libro(1L, 9781400032716L, "titulo", 2023, 100, 50,
-                            50, true, new Autor(1L, "autor", true),
-                            new Editorial(1L, "editorial", true));
+    Libro libro = new Libro(1L, 9781400032716L, "libro", 2023, 100, 50,
+                            50, true, new Autor(1L, "autor", true), new
+                            Editorial(1L, "editorial", true));
 
     @Test
     void getIdTest() {
@@ -21,7 +21,7 @@ class LibroTest {
 
     @Test
     void getTituloTest() {
-        assertEquals("titulo", libro.getTitulo());
+        assertEquals("libro", libro.getTitulo());
     }
 
     @Test
@@ -51,20 +51,16 @@ class LibroTest {
 
     @Test
     void getAutorTest() {
-        Autor autor = new Autor(1L, "autor", true);
-
-        assertEquals(autor.getId(), libro.getAutor().getId());
-        assertEquals(autor.getNombre(), libro.getAutor().getNombre());
-        assertEquals(autor.getAlta(), libro.getAutor().getAlta());
+        assertEquals(1L, libro.getAutor().getId());
+        assertEquals("autor", libro.getAutor().getNombre());
+        assertEquals(true, libro.getAutor().getAlta());
     }
 
     @Test
     void getEditorialTest() {
-        Editorial editorial = new Editorial(1L, "editorial", true);
-
-        assertEquals(editorial.getId(), libro.getEditorial().getId());
-        assertEquals(editorial.getNombre(), libro.getEditorial().getNombre());
-        assertEquals(editorial.getAlta(), libro.getEditorial().getAlta());
+        assertEquals(1L, libro.getEditorial().getId());
+        assertEquals("editorial", libro.getEditorial().getNombre());
+        assertEquals(true, libro.getEditorial().getAlta());
     }
 
     @Test

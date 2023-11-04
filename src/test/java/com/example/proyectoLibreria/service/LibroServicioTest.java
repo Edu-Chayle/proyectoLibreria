@@ -12,29 +12,29 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 
 class LibroServicioTest {
+    @Mock
+    private LibroRepositorio libroRepositoryMock;
     @InjectMocks
     private LibroServicio libroService;
-    @Mock
-    private LibroRepositorio libroRepository;
 
     @Test
     void findAllLibrosTest() {
         Libro libro1 = mock(Libro.class);
         Libro libro2 = mock(Libro.class);
 
-        when(libroRepository.findAll()).thenReturn(Arrays.asList(libro1, libro2));
+        when(libroRepositoryMock.findAll()).thenReturn(Arrays.asList(libro1, libro2));
 
-        List<LibroDto> result =  libroService.findAllLibros();
+        List<LibroDto> listaLibros = libroService.findAllLibros();
 
-        assertEquals(2, result.size());
-        assertNotNull(result);
+        assertNotNull(listaLibros);
+        assertEquals(2, listaLibros.size());
+
+        verify(libroRepositoryMock, times(1)).findAll();
     }
 
     @Test
@@ -42,75 +42,78 @@ class LibroServicioTest {
         Libro libro = mock(Libro.class);
         LibroDto libroDto = mock(LibroDto.class);
 
-        when(libroRepository.save(libro)).thenReturn(libro);
+        when(libroRepositoryMock.save(libro)).thenReturn(libro);
 
-        String result = libroService.saveLibro(libroDto);
+        String mensaje = libroService.saveLibro(libroDto);
 
-        assertNotNull(result);
+        assertNotNull(mensaje);
+        assertEquals("Libro guardado exitosamente.", mensaje);
     }
 
     @Test
     void findLibroTest() {
-        Libro libro = mock(Libro.class);
+        Libro libro = new Libro();
 
-        libro.setTitulo("titulo");
+        libro.setTitulo("libro");
 
-        when(libroRepository.findByTitulo("titulo")).thenReturn(libro);
+        when(libroRepositoryMock.findByTitulo("libro")).thenReturn(libro);
 
-        LibroDto result = libroService.findLibro("titulo");
+        LibroDto libroEncontrado = libroService.findLibro("libro");
 
-        assertEquals(result.getTitulo(), libro.getTitulo());
-        assertNotNull(result);
+        assertNotNull(libroEncontrado);
+        assertEquals("libro", libroEncontrado.getTitulo());
+
+        verify(libroRepositoryMock, times(1)).findByTitulo("libro");
     }
 
     @Test
     void updateLibroTest() {
-        Libro libro = mock(Libro.class);
+        Libro libro = new Libro();
+        LibroDto libroDto = new LibroDto();
 
-        libro.setId(1L);
-        libro.setTitulo("titulo");
+        libroDto.setTitulo("Mortal Kombat");
 
-        when(libroRepository.findById(anyLong())).thenReturn(Optional.ofNullable(libro));
+        when(libroRepositoryMock.findById(1L)).thenReturn(Optional.of(libro));
+        when(libroRepositoryMock.save(libro)).thenReturn(libro);
 
-        libro.setTitulo("Mortal Kombat");
-        libro.setAnio(2020);
+        String mensaje = libroService.updateLibro(1L, libroDto);
 
-        when(libroRepository.save(libro)).thenReturn(libro);
+        assertNotNull(mensaje);
+        assertEquals("El libro "+ libro.getTitulo() +" fue actualizado correctamente.", mensaje);
 
-        LibroDto libroDto = mock(LibroDto.class);
-
-        String result = libroService.updateLibro(1L, libroDto);
-
-        assertEquals("El libro "+ libro.getTitulo() +" fue actualizado correctamente.", result);
-        assertNotNull(result);
+        verify(libroRepositoryMock, times(1)).findById(1L);
+        verify(libroRepositoryMock, times(1)).save(libro);
     }
 
     @Test
     void lowLibroTest() {
         Libro libro = mock(Libro.class);
 
-        libro.setId(1L);
-        libro.setAlta(true);
+        when(libroRepositoryMock.findById(1L)).thenReturn(Optional.of(libro));
+        when(libroRepositoryMock.save(libro)).thenReturn(libro);
 
-        when(libroRepository.findById(1L)).thenReturn(Optional.of(libro));
+        String mensaje = libroService.lowLibro(1L);
 
-        String result = libroService.lowLibro(1L);
+        assertNotNull(mensaje);
+        assertEquals("El libro con ID " + 1L + " fue dado de baja correctamente.", mensaje);
 
-        assertEquals("El libro con ID " + 1L + " fue dado de baja correctamente.", result);
-        assertNotNull(result);
+        verify(libroRepositoryMock, times(1)).findById(1L);
+        verify(libroRepositoryMock, times(1)).save(libro);
     }
 
     @Test
     void deleteLibroTest() {
         Libro libro = mock(Libro.class);
 
-        libro.setId(1L);
+        when(libroRepositoryMock.findById(1L)).thenReturn(Optional.of(libro));
+        doNothing().when(libroRepositoryMock).deleteById(1L);
 
-        when(libroRepository.findById(1L)).thenReturn(Optional.of(libro));
+        String mensaje = libroService.deleteLibro(1L);
 
-        String result = libroService.deleteLibro(1L);
+        assertNotNull(mensaje);
+        assertEquals("El libro con ID " + 1L + " fue eliminado correctamente.", mensaje);
 
-        assertEquals("El libro con ID " + 1L + " fue eliminado correctamente.", result);
-        assertNotNull(result);
+        verify(libroRepositoryMock, times(1)).findById(1L);
+        verify(libroRepositoryMock, times(1)).deleteById(1L);
     }
 }

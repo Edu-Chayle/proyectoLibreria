@@ -30,7 +30,7 @@ public class AutorServicio implements AutorI {
 
         autorRepository.save(autorEntity);
 
-        return "Autor guardado exitosamente";
+        return "Autor guardado exitosamente.";
     }
 
     @Override
